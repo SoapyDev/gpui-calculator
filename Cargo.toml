@@ -1,0 +1,31 @@
+[package]
+name = "calculator"
+version = "0.1.0"
+edition = "2024"
+
+[dependencies]
+# GPUI has no recent crates.io release; track Zed's main branch, pinned to a known-good commit.
+# To update, change `rev` to a newer commit from main.
+gpui = { git = "https://github.com/zed-industries/zed", rev = "e231594b6b" }
+# Linux display backends are off by default here; without them the app silently runs headless.
+gpui_platform = { git = "https://github.com/zed-industries/zed", rev = "e231594b6b", features = ["font-kit", "wayland", "x11"] }
+serde = { version = "1", features = ["derive", "rc"] }
+serde_json = "1"
+
+[lints.clippy]
+pedantic = { level = "warn", priority = -1 }
+nursery = { level = "warn", priority = -1 }
+
+[profile.release]
+codegen-units = 1
+opt-level = 3
+lto = true
+panic = "abort"
+strip = true
+
+# Faster, smaller debug builds: line numbers for our own code, no debug info for dependencies.
+[profile.dev]
+debug = "line-tables-only"
+
+[profile.dev.package."*"]
+debug = false
